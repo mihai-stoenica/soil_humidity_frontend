@@ -10,7 +10,7 @@ function App() {
   };
 
   const test = async () => {
-    await get("http://localhost:8081");
+    await get("http://192.168.1.7:8081");
   };
 
   return (
