@@ -1,41 +1,22 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import { get } from "./services/http.ts";
-
-type TodoBody = {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
-};
+import { get, post } from "./services/http.ts";
 
 function App() {
-  const [todos, setTodos] = useState<TodoBody[]>([]);
+  const login = async () => {
+    await post("http://localhost:8081/api/auth/login", {
+      email: "abc@abc.com",
+      password: "abc123",
+    });
+  };
 
-  useEffect(() => {
-    const fetchTodo = async () => {
-      const response = await get("https://jsonplaceholder.typicode.com/todos");
-      if (!response.isError) {
-        setTodos(response.data);
-      }
-    };
-    fetchTodo();
-  }, []);
+  const test = async () => {
+    await get("http://localhost:8081");
+  };
 
   return (
     <div>
-      {todos ? (
-        todos.map((todo: TodoBody) => (
-          <div>
-            <p>ID: {todo.id}</p>
-            <p>Title: {todo.title}</p>
-            <p>Completed: {todo.completed ? "Yes" : "No"}</p>
-            <hr />
-          </div>
-        ))
-      ) : (
-        <p>Loading...</p>
-      )}
+      <button onClick={login}>login</button>
+      <button onClick={test}>test</button>
     </div>
   );
 }
