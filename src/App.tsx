@@ -1,121 +1,106 @@
 import { useState, useEffect } from "react";
-import { Client, type IMessage } from "@stomp/stompjs"; // IMessage is helpful for typing the received message
-import SockJS from "sockjs-client";
+import { Client, type IMessage } from "@stomp/stompjs";
 import "./App.css";
 import { post } from "./services/http.ts";
 
-// 1. Define an Interface for the Message Object (for state clarity)
+// Interface for UI state
 interface ReceivedMessage {
   id: number;
   text: string;
   receivedAt: string;
 }
 
-// 2. Define the STOMP Client type (Client or null)
-type StompClient = Client | null;
-
-// Helper function to create the WebSocket/SockJS instance
-const socketFactory = (): WebSocket => {
-  // Ensure the path and port (8081) are correct for your Spring Boot app
-  return new SockJS("http://localhost:8081/stomp-ws", null, {
-    transports: ["websocket", "xhr-streaming", "xhr-polling"],
-    // THIS IS KEY: Must be true to include cookies
-    withCredentials: true,
-  }) as WebSocket;
-};
-
 function App() {
-  // 3. Explicitly type state variables
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<ReceivedMessage[]>([]);
-  const [stompClient, setStompClient] = useState<StompClient>(null);
+  const [stompClient, setStompClient] = useState<Client | null>(null);
+
+  // Use localhost for API calls to ensure cookies match domain
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
   const login = async () => {
-    await post(`${apiUrl}/auth/login`, {
-      email: "abc@abc.com",
-      password: "abc123",
-    });
+    try {
+      await post(`${apiUrl}/auth/login`, {
+        email: "abc@abc.com",
+        password: "abc123",
+      });
+      console.log("Login successful! Cookie should be set.");
+    } catch (e) {
+      console.error("Login failed", e);
+    }
   };
-  // 1. Connection and Subscription Setup
+
   useEffect(() => {
-    // Initialize the STOMP client
     const client = new Client({
-      webSocketFactory: socketFactory,
+      brokerURL: import.meta.env.VITE_WS_URL,
+
+      reconnectDelay: 5000,
+
       debug: (str) => {
         console.log("STOMP Debug:", str);
       },
-      reconnectDelay: 10000,
-      connectHeaders: {},
 
+      // Handlers
       onConnect: () => {
         setIsConnected(true);
-        console.log("STOMP: Successfully connected!");
+        console.log("STOMP: Connected via Raw WebSockets!");
 
-        // 2. Subscribe to the public topic used in TesterController
-        // The message argument is strongly typed as IMessage
-        client.subscribe("/topic/response", (message: IMessage) => {
+        client.subscribe("/topic/device/2", (message: IMessage) => {
           const newMessage: ReceivedMessage = {
-            // Use the defined interface
             id: Date.now(),
             text: message.body,
             receivedAt: new Date().toLocaleTimeString(),
           };
-          setMessages((prevMessages) => [...prevMessages, newMessage]);
-          console.log(`Received message: ${message.body}`);
+          setMessages((prev) => [...prev, newMessage]);
+          console.log("Received:", message.body);
         });
       },
 
       onStompError: (frame) => {
         console.error("Broker reported error: " + frame.headers["message"]);
-        console.error("Additional details: " + frame.body);
+        console.error("Details: " + frame.body);
       },
 
-      onDisconnect: () => {
+      onWebSocketClose: () => {
         setIsConnected(false);
-        console.log("STOMP: Disconnected.");
+        console.log("WebSocket Connection Closed");
       },
     });
 
     client.activate();
     setStompClient(client);
 
-    // 3. Cleanup function: Runs when the component unmounts
     return () => {
-      if (client) {
-        // Deactivate the client to gracefully close the connection
-        client.deactivate();
-      }
+      client.deactivate();
     };
   }, []);
 
-  // 4. Function to Send a Message (SEND Frame)
   const sendMessage = () => {
     if (stompClient && isConnected) {
-      // Define the payload structure
-      const payloadObject = {
+      const payload = JSON.stringify({
         messageId: Date.now(),
-        data: "Hello from React (TS)!",
-      };
-
-      const payload = JSON.stringify(payloadObject);
+        data: "Hello from Raw WebSockets!",
+      });
 
       stompClient.publish({
-        destination: "/app/send-data",
+        destination: "/app/device",
         body: payload,
         headers: { "content-type": "application/json" },
       });
-      console.log("Published message to /app/send-data");
-    } else {
-      console.warn("STOMP client not connected or initialized.");
+      console.log("Message sent!");
     }
   };
 
   return (
     <div className="App">
-      <button onClick={login}>login</button>
-      <h1>STOMP WebSocket Tester (TS)</h1>
+      <button onClick={login} style={{ marginBottom: "20px" }}>
+        1. Login First (Set Cookie)
+      </button>
+
+      <h1>STOMP Raw WebSocket Tester</h1>
+
       <p>
-        Connection Status:{" "}
+        Status:{" "}
         <span
           style={{ color: isConnected ? "green" : "red", fontWeight: "bold" }}
         >
@@ -124,23 +109,20 @@ function App() {
       </p>
 
       <button onClick={sendMessage} disabled={!isConnected}>
-        Send Test Data to Spring Boot
+        2. Send Test Data
       </button>
 
-      <h2>Received Server ACKs (/topic/response)</h2>
-      <div className="messages-list">
-        {messages.length === 0 ? (
-          <p>Waiting for messages...</p>
-        ) : (
-          <ul>
-            {messages.map((msg) => (
-              <li key={msg.id}>
-                <strong>[{msg.receivedAt}]</strong> {msg.text}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <h2>Live Messages</h2>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {messages.map((msg) => (
+          <li
+            key={msg.id}
+            style={{ borderBottom: "1px solid #ccc", padding: "5px" }}
+          >
+            <strong>[{msg.receivedAt}]</strong> {msg.text}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
