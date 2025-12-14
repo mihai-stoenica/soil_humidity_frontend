@@ -1,3 +1,9 @@
+let onUnauthorized: () => void = () => {};
+
+export const setupInterceptor = (callback: () => void) => {
+  onUnauthorized = callback;
+};
+
 const fetchData = async (
   url: string,
   method: "POST" | "GET" | "PUT" | "PATCH" | "DELETE",
@@ -14,6 +20,16 @@ const fetchData = async (
         ? JSON.stringify(body)
         : undefined,
   });
+
+  if (response.status === 401) {
+    onUnauthorized();
+
+    return {
+      isError: true,
+      code: 401,
+      message: "Unauthorized",
+    };
+  }
 
   if (response.status === 204) {
     return {
