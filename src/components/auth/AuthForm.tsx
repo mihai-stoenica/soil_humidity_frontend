@@ -37,7 +37,8 @@ function AuthForm({ mode }: AuthFormProps) {
       try {
         await login(formData);
       } catch (error) {
-        setError(error.message);
+        const message: string = (error as { message: string }).message;
+        setError(message);
       }
     } else if (mode === "register") {
       await register(formData);
