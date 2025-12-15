@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { setupInterceptor } from "./services/http.ts";
 import { useAuth } from "./context/AuthContext.tsx";
 import Home from "./pages/home/Home.tsx";
+import DevicePage from "./pages/device/DevicePage.tsx";
 
 function App() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path={"/"} element={<Home />} />
+        <Route path={"/devices/:id"} element={<DevicePage />} />
       </Routes>
     </>
   );

@@ -2,11 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
 import { get } from "../../services/http.ts";
+import AddDeviceModal from "../../components/device/AddDeviceModal.tsx";
+import { RefreshCw } from "lucide-react";
 
 interface Device {
   id: string;
   name: string;
   connected: boolean;
+  lastSeen: string;
+  lastHumidity: number;
 }
 
 const Home = () => {
@@ -14,6 +18,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -79,7 +84,16 @@ const Home = () => {
           </div>
         </div>
 
-        <h2 className="text-lg font-semibold mb-3 px-1">Your Devices</h2>
+        <h2 className="text-lg font-semibold mb-3 px-1 flex items-center justify-between">
+          Your Devices
+          <button
+            className="btn btn-sm btn-circle btn-ghost p-1"
+            onClick={fetchDevices}
+            title="Refresh devices"
+          >
+            <RefreshCw />
+          </button>
+        </h2>
 
         {loading ? (
           <div className="flex justify-center p-10">
@@ -101,7 +115,6 @@ const Home = () => {
                     🎛
                   </div>
 
-                  {/* Text Content */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-base truncate">
                       {device.name}
@@ -113,6 +126,8 @@ const Home = () => {
                       <span className="capitalize">
                         {device.connected ? "online" : "offline"}
                       </span>
+                      <span>•</span>
+                      <span>{new Date(device.lastSeen).toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -135,29 +150,35 @@ const Home = () => {
                 </div>
               </div>
             ))}
-
-            <div className="card border-2 border-dashed border-base-300 bg-transparent hover:border-primary hover:bg-base-100/50 transition-colors cursor-pointer flex items-center justify-center min-h-[5rem]">
-              <div className="flex flex-col items-center gap-1 py-4 text-base-content/40">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-                <span className="text-xs font-bold">Add Device</span>
+            <button onClick={() => setModal(!modal)}>
+              <div className="card border-2 border-dashed border-base-300 bg-transparent hover:border-primary hover:bg-base-100/50 transition-colors cursor-pointer flex items-center justify-center min-h-[5rem]">
+                <div className="flex flex-col items-center gap-1 py-4 text-base-content/40">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                  <span className="text-xs font-bold">Add Device</span>
+                </div>
               </div>
-            </div>
+            </button>
           </div>
         )}
       </div>
+      <AddDeviceModal
+        isOpen={modal}
+        onClose={() => setModal(false)}
+        onSuccess={fetchDevices}
+      />
     </div>
   );
 };
