@@ -15,6 +15,7 @@ const AddDeviceModal = ({
   const [formData, setFormData] = useState({
     name: "",
     apiKey: "",
+    w_time: 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +31,10 @@ const AddDeviceModal = ({
       const response = await post(`${apiUrl}/devices/claim`, {
         name: formData.name,
         apiKey: formData.apiKey,
+        watering_time: formData.w_time,
       });
       if (!response.isError) {
-        setFormData({ name: "", apiKey: "" });
+        setFormData({ name: "", apiKey: "", w_time: 0 });
         onSuccess();
         onClose();
       } else {
@@ -112,6 +114,21 @@ const AddDeviceModal = ({
                   Usually found on the back of the sensor
                 </span>
               </label>
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Default watering time(s)</span>
+              </label>
+              <input
+                type="number"
+                className="input input-bordered w-full"
+                value={formData.w_time}
+                onChange={(e) =>
+                  setFormData({ ...formData, w_time: parseInt(e.target.value) })
+                }
+                required
+              />
             </div>
 
             <div className="modal-action mt-6">

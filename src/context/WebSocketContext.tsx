@@ -24,16 +24,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     const client = new Client({
       brokerURL: import.meta.env.VITE_WS_URL,
       reconnectDelay: 5000,
-      debug: (msg) => console.log("[STOMP Global]", msg),
     });
 
     client.onConnect = () => {
-      console.log("Global STOMP Connected");
       setIsConnected(true);
     };
 
     client.onDisconnect = () => {
-      console.log("Global STOMP Disconnected");
       setIsConnected(false);
     };
 
@@ -45,7 +42,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     client.activate();
     clientRef.current = client;
 
-    // Cleanup on unmount (app close)
     return () => {
       client.deactivate();
     };

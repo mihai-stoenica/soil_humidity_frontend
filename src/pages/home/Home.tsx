@@ -4,14 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { get } from "../../services/http.ts";
 import AddDeviceModal from "../../components/device/AddDeviceModal.tsx";
 import { RefreshCw } from "lucide-react";
-
-interface Device {
-  id: string;
-  name: string;
-  connected: boolean;
-  lastSeen: string;
-  lastHumidity: number;
-}
+import type Device from "../../types/Device.ts";
 
 const Home = () => {
   const { user } = useAuth();
@@ -35,8 +28,8 @@ const Home = () => {
     fetchDevices();
   }, [fetchDevices]);
 
-  const handleDeviceClick = (deviceId: string) => {
-    navigate(`/devices/${deviceId}`);
+  const handleDeviceClick = (deviceId: number) => {
+    navigate(`/devices/${deviceId.toString()}`);
   };
 
   return (
