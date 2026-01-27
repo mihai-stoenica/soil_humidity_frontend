@@ -4,7 +4,7 @@ import type Device from "../../types/Device.ts";
 import { get } from "../../services/http.ts";
 import { useWebSocket } from "../../context/WebSocketContext";
 import { RefreshCw, Settings } from "lucide-react";
-import PresetForm from "../../components/device/PresetForm.tsx";
+import PresetMenu from "../../components/device/PresetMenu.tsx";
 
 const DeviceDetails = () => {
   const { id } = useParams();
@@ -80,7 +80,7 @@ const DeviceDetails = () => {
 
   return (
     <div className="h-full bg-base-200 p-4 pb-20">
-      <div className="max-w-md mx-auto mb-6 flex items-center gap-4">
+      <div className="max-w-xl mx-auto mb-6 flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
           className="btn btn-circle btn-ghost btn-sm"
@@ -114,14 +114,17 @@ const DeviceDetails = () => {
         </button>
       </div>
 
-      <div className="max-w-md mx-auto space-y-4">
+      <div className="max-w-xl mx-auto space-y-4">
         {showSettings ? (
-          <PresetForm
-            id={id}
-            onClose={() => {
-              setShowSettings(false);
-            }}
-          />
+          <>
+            <PresetMenu
+              id={id}
+              onSave={() => {
+                fetchDevice();
+              }}
+              activePreset={device.activePreset}
+            />
+          </>
         ) : (
           <></>
         )}

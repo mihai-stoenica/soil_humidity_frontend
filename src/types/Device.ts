@@ -4,4 +4,5 @@ export default interface Device {
   connected: boolean;
   lastSeen: string;
   lastHumidity: number;
+  activePreset: number;
 }

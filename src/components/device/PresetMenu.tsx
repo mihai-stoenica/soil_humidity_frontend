@@ -1,27 +1,51 @@
-import { useEffect, useState } from "react";
-import { post } from "../../services/http.ts";
+import { useCallback, useEffect, useState } from "react";
+import { get, post } from "../../services/http.ts";
+import type { Preset } from "../../types/Preset.ts";
 
 type FormProps = {
   id: string | undefined;
-  onClose: () => void;
+  activePreset: number | undefined;
+  onSave: () => void;
 };
 
-const PresetForm = ({ id, onClose }: FormProps) => {
+const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
   type Pattern = "continuous" | "step" | "";
 
   const [wateringTime, setWateringTime] = useState("");
   const [pattern, setPattern] = useState<Pattern>("");
   const [steps, setSteps] = useState("");
   const [delay, setDelay] = useState("");
+  const [presets, setPresets] = useState<Preset[]>();
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  const fetchPresets = useCallback(async () => {
+    const response = await get(`${apiUrl}/presets/${id}`);
+    if (!response.isError) {
+      setPresets(response.data);
+    }
+  }, [apiUrl, id]);
+
+  const setActive = async (presetId: number) => {
+    const response = await post(
+      `${apiUrl}/presets/device/${id}/preset/${presetId}`,
+      {},
+    );
+    if (!response.isError) {
+      await onSave();
+    }
+  };
+
+  useEffect(() => {
+    fetchPresets();
+  }, [fetchPresets]);
 
   useEffect(() => {
     if (pattern !== "step") {
       setSteps("");
       setDelay("");
     }
-  }, [pattern]);
+  }, [pattern, presets]);
 
   const handleSubmit = async () => {
     if (!wateringTime || !pattern) return;
@@ -40,15 +64,52 @@ const PresetForm = ({ id, onClose }: FormProps) => {
           };
     const response = await post(`${apiUrl}/presets/${id}`, preset);
     if (!response.isError) {
-      onClose();
+      fetchPresets();
+      onSave();
     }
   };
 
   if (!id) return;
   return (
     <div className="card">
-      <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-xs border p-4 shadow-lg">
+      <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-xs border p-4 shadow-lg flex flex-col items-center">
         <legend className="fieldset-legend">Presets</legend>
+
+        {presets ? (
+          <div className="overflow-x-auto">
+            <table className="table table-compact w-full">
+              <thead>
+                <tr>
+                  <th className="text-center truncate max-w-[80px]">Time(s)</th>
+                  <th className="text-center truncate max-w-[80px]">Pattern</th>
+                  <th className="text-center truncate max-w-[80px]">Steps</th>
+                  <th className="text-center truncate max-w-[80px]">
+                    Delay(s)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {presets?.map((p) => (
+                  <tr
+                    className={activePreset === p.id ? "bg-success" : ""}
+                    onClick={() => setActive(p.id)}
+                  >
+                    <td className="text-center">{p.watering_time}</td>
+                    <td className="text-center">{p.pattern}</td>
+                    <td className="text-center">
+                      {p.pattern === "step" ? p.steps : "-"}
+                    </td>
+                    <td className="text-center">
+                      {p.pattern === "step" ? p.delay : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>Loading..</p>
+        )}
 
         <label className="label">Watering time</label>
         <input
@@ -96,7 +157,7 @@ const PresetForm = ({ id, onClose }: FormProps) => {
             />
           </>
         )}
-        <button className="btn btn-neutral mt-4" onClick={handleSubmit}>
+        <button className="btn btn-success mt-4 w-[20%]" onClick={handleSubmit}>
           Save
         </button>
       </fieldset>
@@ -104,4 +165,4 @@ const PresetForm = ({ id, onClose }: FormProps) => {
   );
 };
 
-export default PresetForm;
+export default PresetMenu;
