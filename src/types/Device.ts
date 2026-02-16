@@ -5,4 +5,5 @@ export default interface Device {
   lastSeen: string;
   lastHumidity: number;
   activePreset: number;
+  temperature: number;
 }

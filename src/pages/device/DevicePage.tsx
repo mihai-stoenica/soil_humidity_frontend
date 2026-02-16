@@ -37,7 +37,13 @@ const DeviceDetails = () => {
       const data = JSON.parse(message.body);
       if (data.humidity !== undefined) {
         setDevice((prev) =>
-          prev ? { ...prev, lastHumidity: data.humidity } : prev,
+          prev
+            ? {
+                ...prev,
+                lastHumidity: data.humidity,
+                temperature: data.temperature,
+              }
+            : prev,
         );
       }
     });
@@ -150,6 +156,7 @@ const DeviceDetails = () => {
                 <span className="text-4xl font-black">
                   {device.lastHumidity}%
                 </span>
+                {device.temperature}°C
               </div>
             </div>
 
