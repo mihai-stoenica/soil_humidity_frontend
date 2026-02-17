@@ -210,7 +210,7 @@ const DeviceDetails = () => {
               </svg>
               <div className="text-xs opacity-50">Last Sync</div>
               <div className="font-bold text-sm">
-                {formatTime(device.lastSeen)}
+                {device.lastSeen && formatTime(device.lastSeen)}
               </div>
             </div>
           </div>
