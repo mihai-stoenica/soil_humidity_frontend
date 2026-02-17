@@ -4,6 +4,7 @@ import type Device from "../../types/Device.ts";
 import { get } from "../../services/http.ts";
 import { useWebSocket } from "../../context/WebSocketContext";
 import { RefreshCw, Settings } from "lucide-react";
+import { formatTime } from "../../services/datetime.ts";
 import PresetMenu from "../../components/device/PresetMenu.tsx";
 
 const DeviceDetails = () => {
@@ -52,16 +53,6 @@ const DeviceDetails = () => {
       subscription.unsubscribe();
     };
   }, [id, isConnected, client]);
-
-  const formatTime = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   const getHumidityColor = (value: number) => {
     if (value < 30) return "text-warning";
@@ -200,7 +191,12 @@ const DeviceDetails = () => {
               >
                 Water Now
               </button>
-              <button className="btn btn-outline btn-sm flex-1">History</button>
+              <button
+                className="btn btn-outline btn-sm flex-1"
+                onClick={() => navigate("history")}
+              >
+                History
+              </button>
             </div>
           </div>
         </div>
@@ -224,7 +220,7 @@ const DeviceDetails = () => {
               </svg>
               <div className="text-xs opacity-50">Last Sync</div>
               <div className="font-bold text-sm">
-                {formatTime(device.lastSeen)}
+                {device.lastSeen && formatTime(device.lastSeen)}
               </div>
             </div>
           </div>

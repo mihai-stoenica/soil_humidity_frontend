@@ -7,6 +7,7 @@ import { setupInterceptor } from "./services/http.ts";
 import { useAuth } from "./context/AuthContext.tsx";
 import Home from "./pages/home/Home.tsx";
 import DevicePage from "./pages/device/DevicePage.tsx";
+import HistoryPage from "./pages/device/HistoryPage.tsx";
 
 function App() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path={"/"} element={<Home />} />
         <Route path={"/devices/:id"} element={<DevicePage />} />
+        <Route path={"/devices/:id/history"} element={<HistoryPage />} />
       </Routes>
     </>
   );
