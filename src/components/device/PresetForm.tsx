@@ -13,6 +13,7 @@ const PresetForm = ({ id, onClose }: FormProps) => {
   const [pattern, setPattern] = useState<Pattern>("");
   const [steps, setSteps] = useState("");
   const [delay, setDelay] = useState("");
+  const [error, setError] = useState("");
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -41,6 +42,8 @@ const PresetForm = ({ id, onClose }: FormProps) => {
     const response = await post(`${apiUrl}/presets/${id}`, preset);
     if (!response.isError) {
       onClose();
+    } else {
+      setError(response.message);
     }
   };
 
@@ -99,6 +102,9 @@ const PresetForm = ({ id, onClose }: FormProps) => {
         <button className="btn btn-neutral mt-4" onClick={handleSubmit}>
           Save
         </button>
+        {error.length > 0 && (
+          <p className={"text-error text-center"}>{error}</p>
+        )}
       </fieldset>
     </div>
   );
