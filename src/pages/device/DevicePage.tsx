@@ -42,7 +42,7 @@ const DeviceDetails = () => {
             ? {
                 ...prev,
                 lastHumidity: data.humidity,
-                temperature: data.temperature,
+                lastTemperature: data.temperature,
               }
             : prev,
         );
@@ -147,7 +147,7 @@ const DeviceDetails = () => {
                 <span className="text-4xl font-black">
                   {device.lastHumidity}%
                 </span>
-                {device.temperature}°C
+                {device.lastTemperature}°C
               </div>
             </div>
 

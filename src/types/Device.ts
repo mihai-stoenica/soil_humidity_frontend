@@ -4,6 +4,6 @@ export default interface Device {
   connected: boolean;
   lastSeen: string;
   lastHumidity: number;
+  lastTemperature: number;
   activePreset: number;
-  temperature: number;
 }
