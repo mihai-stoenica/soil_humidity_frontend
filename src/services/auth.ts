@@ -33,5 +33,6 @@ export const authService = {
     await post(`${API_URL}/auth/logout`, {});
     localStorage.removeItem("userId");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("name");
   },
 };

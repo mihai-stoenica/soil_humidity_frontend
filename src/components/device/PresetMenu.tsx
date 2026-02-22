@@ -16,6 +16,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
   const [steps, setSteps] = useState("");
   const [delay, setDelay] = useState("");
   const [presets, setPresets] = useState<Preset[]>();
+  const [error, setError] = useState<string | null>(null);
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -32,7 +33,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
       {},
     );
     if (!response.isError) {
-      await onSave();
+      onSave();
     }
   };
 
@@ -66,6 +67,9 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
     if (!response.isError) {
       fetchPresets();
       onSave();
+      setError("");
+    } else {
+      setError(response.message);
     }
   };
 
@@ -119,6 +123,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
           min={1}
           value={wateringTime}
           onChange={(e) => setWateringTime(e.target.value)}
+          required={true}
         />
 
         <label className="label">Pattern</label>
@@ -126,6 +131,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
           className="select appearance-none border px-2"
           value={pattern}
           onChange={(e) => setPattern(e.target.value as Pattern)}
+          required={true}
         >
           <option value="" disabled>
             Pick one
@@ -144,6 +150,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
               min={1}
               value={steps}
               onChange={(e) => setSteps(e.target.value)}
+              required={true}
             />
 
             <label className="label">Delay between steps</label>
@@ -154,8 +161,27 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
               min={1}
               value={delay}
               onChange={(e) => setDelay(e.target.value)}
+              required={true}
             />
           </>
+        )}
+        {error && (
+          <div className="alert alert-error text-sm py-2 mt-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{error}</span>
+          </div>
         )}
         <button className="btn btn-success mt-4 w-[20%]" onClick={handleSubmit}>
           Save

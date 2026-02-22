@@ -38,26 +38,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (credentials: AuthCredentials) => {
-    try {
-      const userData = await authService.login(credentials);
-      setUser(userData);
-
-      // eslint-disable-next-line no-useless-catch
-    } catch (error) {
-      throw error;
-    } finally {
-      navigate("/");
-    }
+    const userData = await authService.login(credentials);
+    setUser(userData);
+    navigate("/");
   };
 
   const register = async (data: AuthCredentials) => {
-    // eslint-disable-next-line no-useless-catch
-    try {
-      const userData = await authService.register(data);
-      setUser(userData);
-    } catch (error) {
-      throw error;
-    }
+    const userData = await authService.register(data);
+    setUser(userData);
   };
 
   const logout = () => {

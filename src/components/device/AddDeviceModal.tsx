@@ -62,25 +62,6 @@ const AddDeviceModal = ({
         <fieldset className="fieldset  bg-base-200 border-base-300 rounded-box w-xs border p-4">
           <legend className="fieldset-legend">Register a new device</legend>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && (
-              <div className="alert alert-error text-sm py-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Device Name</span>
@@ -130,8 +111,25 @@ const AddDeviceModal = ({
                 required
               />
             </div>
-
-            <div className="modal-action mt-6">
+            {error && (
+              <div className="alert alert-error text-sm py-2 mt-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+            <div className="modal-action mt-2">
               <button
                 type="button"
                 className="btn btn-error px-2 "

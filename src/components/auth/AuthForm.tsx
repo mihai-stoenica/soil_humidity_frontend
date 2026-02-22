@@ -33,15 +33,11 @@ function AuthForm({ mode }: AuthFormProps) {
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (mode === "login") {
-      try {
-        await login(formData);
-      } catch (error) {
-        const message: string = (error as { message: string }).message;
-        setError(message);
-      }
-    } else if (mode === "register") {
-      await register(formData);
+    try {
+      await (mode === "login" ? login(formData) : register(formData));
+    } catch (error) {
+      const message: string = (error as { message: string }).message;
+      setError(message);
     }
   };
 
@@ -103,7 +99,9 @@ function AuthForm({ mode }: AuthFormProps) {
               })
             }
           />
-          {error.length > 0 && <p className={"text-error"}>{error}</p>}
+          {error.length > 0 && (
+            <p className={"text-error text-center"}>{error}</p>
+          )}
 
           <div className="flex flex-row items-center mt-4 justify-between gap-4">
             {mode === "register" ? (
