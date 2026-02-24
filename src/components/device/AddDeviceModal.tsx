@@ -15,6 +15,7 @@ const AddDeviceModal = ({
   const [formData, setFormData] = useState({
     name: "",
     apiKey: "",
+    secret: "",
     w_time: 0,
   });
   const [loading, setLoading] = useState(false);
@@ -32,9 +33,10 @@ const AddDeviceModal = ({
         name: formData.name,
         apiKey: formData.apiKey,
         watering_time: formData.w_time,
+        secret: formData.secret,
       });
       if (!response.isError) {
-        setFormData({ name: "", apiKey: "", w_time: 0 });
+        setFormData({ name: "", apiKey: "", secret: "", w_time: 0 });
         onSuccess();
         onClose();
       } else {
@@ -116,6 +118,25 @@ const AddDeviceModal = ({
               </label>
             </div>
 
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Device secret</span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered w-full font-mono"
+                value={formData.secret}
+                onChange={(e) =>
+                  setFormData({ ...formData, secret: e.target.value })
+                }
+                required
+              />
+              <label className="label">
+                <span className="label-text-alt text-base-content/60">
+                  Usually found on the back of the sensor
+                </span>
+              </label>
+            </div>
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Default watering time(s)</span>
