@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const id = localStorage.getItem("userId");
     const email = localStorage.getItem("userEmail");
-    const name = localStorage.getItem("name");
+    const name = localStorage.getItem("userName");
     if (id && email && name) {
       setUser({ id, email, name });
     }

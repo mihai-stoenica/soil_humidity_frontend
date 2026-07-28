@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { get } from "../../services/http.ts";
 import { formatTime } from "../../services/datetime.ts";
 
-type HumidityRecord = {
+type Record = {
   id: number;
-  value: number;
+  humidity: number;
+  temperature: number;
   timestamp: string;
 };
 
@@ -15,7 +16,7 @@ const HistoryPage = () => {
 
   const { id } = useParams();
   const [page, setPage] = useState(0);
-  const [humidityRecords, setHumidityRecords] = useState<HumidityRecord[]>([]);
+  const [humidityRecords, setHumidityRecords] = useState<Record[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [size, setSize] = useState(10);
 
@@ -42,21 +43,36 @@ const HistoryPage = () => {
     setPage((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
-  const pData = humidityRecords.map((r: HumidityRecord) => r.value);
-  const xLabels = humidityRecords.map((r: HumidityRecord) =>
-    formatTime(r.timestamp),
-  );
+  const pData = humidityRecords.map((r: Record) => r.humidity);
+  const tData = humidityRecords.map((r: Record) => r.temperature);
+  const xLabels = humidityRecords.map((r: Record) => formatTime(r.timestamp));
 
   return (
     <div className="w-[90%] h-[500px] ">
       <LineChart
         height={500}
-        series={[{ data: [...pData].reverse(), label: "humidity" }]}
+        series={[
+          {
+            data: [...pData].reverse(),
+            label: "Humidity (%)",
+            yAxisId: "humidity-axis",
+            color: "#02b2af",
+          },
+          {
+            data: [...tData].reverse(),
+            label: "Temperature (°C)",
+            yAxisId: "temperature-axis",
+            color: "#f44336",
+          },
+        ]}
         xAxis={[
           { scaleType: "point", data: [...xLabels].reverse(), height: 28 },
         ]}
-        yAxis={[{ min: 0, max: 100 }]}
-        margin={{ right: 24 }}
+        yAxis={[
+          { id: "humidity-axis", position: "left", min: 0, max: 100 },
+          { id: "temperature-axis", position: "right" },
+        ]}
+        margin={{ right: 50 }}
       />
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center gap-6 mt-6">

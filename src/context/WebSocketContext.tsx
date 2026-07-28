@@ -24,6 +24,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     const client = new Client({
       brokerURL: import.meta.env.VITE_WS_URL,
       reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
     });
 
     client.onConnect = () => {

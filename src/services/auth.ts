@@ -12,11 +12,12 @@ export const authService = {
     const response = await post(`${API_URL}/auth/login`, credentials);
 
     if (!response.isError) {
-      const user = response.data;
-      localStorage.setItem("userId", user.id);
-      localStorage.setItem("userEmail", user.email);
-      localStorage.setItem("name", user.name);
-      return user;
+      const data = response.data;
+      localStorage.setItem("userId", data.user.id);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("accessToken", data.accessToken);
+      return data.user;
     }
     throw new Error(response.message || "Login failed");
   },
@@ -29,9 +30,10 @@ export const authService = {
     throw new Error(response.message || "Registration failed");
   },
 
-  logout: async () => {
-    await post(`${API_URL}/auth/logout`, {});
+  logout: () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("accessToken");
   },
 };
