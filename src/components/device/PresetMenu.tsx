@@ -11,6 +11,7 @@ type FormProps = {
 const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
   type Pattern = "continuous" | "step" | "";
 
+  const [name, setName] = useState("");
   const [wateringTime, setWateringTime] = useState("");
   const [pattern, setPattern] = useState<Pattern>("");
   const [steps, setSteps] = useState("");
@@ -48,18 +49,20 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
   }, [pattern, presets]);
 
   const handleSubmit = async () => {
-    if (!wateringTime || !pattern) return;
+    if (!wateringTime || !pattern || !name) return;
 
     const preset =
       pattern === "step"
         ? {
             pattern: "step" as const,
             watering_time: Number(wateringTime),
+            name: name,
             steps: Number(steps),
             delay: Number(delay),
           }
         : {
             pattern: "continuous" as const,
+            name: name,
             watering_time: Number(wateringTime),
           };
     const response = await post(`${apiUrl}/presets/${id}`, preset);
@@ -71,21 +74,20 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
 
   if (!id) return;
   return (
-    <div className="card">
-      <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-xs border p-4 shadow-lg flex flex-col items-center">
+    <div className="card ">
+      <fieldset className="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4 shadow-lg flex flex-col items-center">
         <legend className="fieldset-legend">Presets</legend>
 
         {presets ? (
           <div className="overflow-x-auto">
-            <table className="table table-compact w-full">
+            <table className="table table-compact w-full border">
               <thead>
                 <tr>
-                  <th className="text-center truncate max-w-[80px]">Time(s)</th>
-                  <th className="text-center truncate max-w-[80px]">Pattern</th>
-                  <th className="text-center truncate max-w-[80px]">Steps</th>
-                  <th className="text-center truncate max-w-[80px]">
-                    Delay(s)
-                  </th>
+                  <th className="text-center truncate max-w-20">Name</th>
+                  <th className="text-center truncate max-w-20">Time(s)</th>
+                  <th className="text-center truncate max-w-20">Pattern</th>
+                  <th className="text-center truncate max-w-20">Steps</th>
+                  <th className="text-center truncate max-w-20">Delay(s)</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,6 +96,7 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
                     className={activePreset === p.id ? "bg-success" : ""}
                     onClick={() => setActive(p.id)}
                   >
+                    <td className="text-center">{p.name}</td>
                     <td className="text-center">{p.watering_time}</td>
                     <td className="text-center">{p.pattern}</td>
                     <td className="text-center">
@@ -110,6 +113,16 @@ const PresetMenu = ({ id, onSave, activePreset }: FormProps) => {
         ) : (
           <p>Loading..</p>
         )}
+
+        <label className="label">Name</label>
+        <input
+          type="text"
+          className="input border px-2"
+          placeholder="Name"
+          required={true}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
         <label className="label">Watering time</label>
         <input

@@ -70,7 +70,7 @@ const HistoryPage = () => {
         ]}
         yAxis={[
           { id: "humidity-axis", position: "left", min: 0, max: 100 },
-          { id: "temperature-axis", position: "right" },
+          { id: "temperature-axis", position: "right", min: -20, max: 50 },
         ]}
         margin={{ right: 50 }}
       />

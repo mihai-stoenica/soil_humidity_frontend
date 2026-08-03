@@ -71,7 +71,7 @@ const Home = () => {
           <div className="stat">
             <div className="stat-title">Active Devices</div>
             <div className="stat-value text-secondary text-2xl">
-              {devices.filter((d) => d.connected).length} / {devices.length}
+              {devices?.filter((d) => d.connected).length} / {devices.length}
             </div>
             <div className="stat-desc">All systems normal</div>
           </div>
